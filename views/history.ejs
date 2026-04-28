@@ -1,0 +1,56 @@
+<%- include('partials/header') %>
+
+<div class="glass-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h2>Scan History</h2>
+        <form action="/history?_method=DELETE" method="POST">
+            <button type="submit" class="btn" style="background: rgba(239, 68, 68, 0.1); color: var(--alert-red); border: 1px solid var(--alert-red); font-size: 0.8rem;">CLEAR HISTORY</button>
+        </form>
+    </div>
+
+    <div class="table-container">
+        <% if (history.length > 0) { %>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Suspect URL</th>
+                        <th>Matched To</th>
+                        <th>Match Score</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% history.forEach(item => { %>
+                        <tr>
+                            <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                <a href="/results/<%= item._id %>" style="color: var(--accent-blue);"><%= item.suspectUrl %></a>
+                            </td>
+                            <td><%= item.comparedTo ? item.comparedTo.fileName : 'Deleted Asset' %></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="width: 60px; height: 6px; background: var(--glass-border); border-radius: 3px; overflow: hidden;">
+                                        <div style="width: <%= item.similarityScore %>%; height: 100%; background: <%= item.similarityScore >= 80 ? 'var(--alert-red)' : (item.similarityScore >= 60 ? 'var(--alert-amber)' : 'var(--status-green)') %>"></div>
+                                    </div>
+                                    <span style="font-size: 0.8rem; font-weight: 700;"><%= item.similarityScore %>%</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge <%= item.status === 'LEAK DETECTED' ? 'badge-leak' : (item.status === 'SUSPICIOUS' ? 'badge-suspicious' : 'badge-clear') %>">
+                                    <%= item.status %>
+                                </span>
+                            </td>
+                            <td style="color: var(--text-secondary); font-size: 0.8rem;"><%= new Date(item.scannedAt).toLocaleString() %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                No scans executed yet.
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

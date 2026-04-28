@@ -1,0 +1,48 @@
+<%- include('partials/header') %>
+
+<div class="hero stagger-in">
+    <h1 class="gradient-title" style="font-size: 3.5rem;">Global Search</h1>
+    <p class="subtitle">Deploying neural cross-referencing nodes. Scan suspicious URLs against the official Vault DNA database.</p>
+</div>
+
+<div class="glass-card scanner-card stagger-in" style="max-width: 800px; margin: 0 auto;">
+    <div class="scanner-glow"></div>
+    <div class="card-header">
+        <h2 class="card-title"><span class="card-title-icon">◈</span> Suspect Analysis</h2>
+        <div class="badge badge-protected">Neural active</div>
+    </div>
+
+    <form action="/scan" method="POST" id="scan-form">
+        <div class="form-group" style="margin-bottom: 30px;">
+            <label style="text-transform: uppercase; font-weight: 800; font-size: 0.7rem; letter-spacing: 0.1em;">Suspect External URL</label>
+            <input type="url" name="suspectUrl" class="form-control" placeholder="https://external-platform.cdn/path/to/suspect/video" required 
+                   style="background: rgba(255,255,255,0.03); border-radius: 12px; height: 50px; font-family: monospace;">
+        </div>
+
+        <div class="form-group">
+            <label style="text-transform: uppercase; font-weight: 800; font-size: 0.7rem; letter-spacing: 0.1em;">Target Reference Asset</label>
+            <select name="officialVideoId" class="form-control" required style="background: rgba(255,255,255,0.03); border-radius: 12px; height: 50px;">
+                <option value="" disabled selected>Select from synchronized vault...</option>
+                <% videos.forEach(video => { %>
+                    <option value="<%= video._id %>"><%= video.fileName %> (<%= video.durationEstimate %>s)</option>
+                <% }) %>
+            </select>
+        </div>
+
+        <div style="margin-top: 40px;">
+            <button type="submit" class="btn btn-primary" style="width: 100%; height: 60px; font-size: 1rem;">
+                ✦ INITIATE DEEP SCAN
+            </button>
+        </div>
+    </form>
+    
+    <div style="margin-top: 30px; display: flex; gap: 10px; opacity: 0.4; justify-content: center;">
+        <span style="font-size: 0.6rem; text-transform: uppercase;">Node: EU-West-1</span>
+        <span style="font-size: 0.6rem;">|</span>
+        <span style="font-size: 0.6rem; text-transform: uppercase;">Proxy: AES-256</span>
+        <span style="font-size: 0.6rem;">|</span>
+        <span style="font-size: 0.6rem; text-transform: uppercase;">Lat: <%= Math.floor(Math.random() * 50) %>ms</span>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

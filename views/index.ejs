@@ -1,0 +1,115 @@
+<%- include('partials/header') %>
+
+<div class="hero stagger-in">
+    <h1 class="gradient-title">ContentGuard</h1>
+    <p class="subtitle">Next-gen digital DNA protection. Monitor, detect, and enforce intellectual property rights across the global sports network.</p>
+</div>
+
+<div class="advanced-grid stagger-in">
+    <!-- Main Command Area -->
+    <div class="main-column">
+        <div class="glass-card" style="margin-bottom: 30px;">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <span class="card-title-icon">✦</span> Vault Registration
+                </h2>
+                <div class="badge badge-protected">Ready for ingest</div>
+            </div>
+            
+            <form action="/upload" method="POST" enctype="multipart/form-data">
+                <div class="upload-wrapper" onclick="document.getElementById('video-input').click()">
+                    <div class="upload-zone">
+                        <div class="scan-line"></div>
+                        <span class="upload-icon-anim">⌬</span>
+                        <h3>Secure Fingerprint Extraction</h3>
+                        <p style="color: var(--text-secondary); margin-top: 10px;">Drag video assets to tokenize or click to browse</p>
+                        <input type="file" name="video" id="video-input" hidden accept="video/*" onchange="this.form.submit()">
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="glass-card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <span class="card-title-icon">◈</span> Protected Infrastructure
+                </h2>
+                <span style="font-size: 0.7rem; color: var(--text-secondary);"><%= videos.length %> Assets Synchronized</span>
+            </div>
+            
+            <div class="table-scroll">
+                <% if (videos.length > 0) { %>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>IDENTIFIER / UPLOADED</th>
+                                <th>DNA HASH</th>
+                                <th>LENGTH</th>
+                                <th>STATUS</th>
+                                <th style="text-align: right;">NODE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% videos.forEach(video => { %>
+                                <tr class="asset-row">
+                                    <td>
+                                        <div style="font-weight: 700; color: #fff; font-size: 0.9rem;"><%= video.fileName %></div>
+                                        <div style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase;"><%= new Date(video.uploadedAt).toLocaleString() %></div>
+                                    </td>
+                                    <td>
+                                        <code style="background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 6px; color: var(--accent-cyan); font-size: 0.75rem; border: 1px solid rgba(6, 182, 212, 0.2);">
+                                            <%= video.colorHash.substring(0,4) %>..<%= video.audioHash.substring(0,4) %>
+                                        </code>
+                                    </td>
+                                    <td style="font-weight: 600; font-size: 0.85rem;"><%= video.durationEstimate %>s</td>
+                                    <td><span class="badge badge-protected">Protected</span></td>
+                                    <td style="text-align: right;">
+                                        <form action="/delete-asset/<%= video._id %>?_method=DELETE" method="POST" style="display: inline;" onsubmit="return confirm('Decommission this asset from protection?')">
+                                            <button type="submit" class="btn-icon">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                <% } else { %>
+                    <div style="text-align: center; padding: 60px 0; opacity: 0.6;">
+                        <h3 style="color: var(--text-secondary);">No assets in local cluster.</h3>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Info area -->
+    <div class="sidebar-column">
+        <div class="glass-card" style="padding: 25px;">
+            <h3 class="sidebar-title">✦ System Integrity</h3>
+            <div class="data-card">
+                <div class="data-label">Status</div>
+                <div class="data-value" style="color: var(--status-green);">OPERATIONAL</div>
+            </div>
+            <div class="data-card">
+                <div class="data-label">VIRTUAL STORAGE</div>
+                <div class="data-value">SYNCED</div>
+            </div>
+            
+            <h3 class="sidebar-title" style="margin-top: 30px;">◈ Security Log</h3>
+            <div style="font-size: 0.7rem; font-family: monospace; color: var(--text-secondary);">
+                <div style="margin-bottom: 8px; border-left: 2px solid var(--accent-blue); padding-left: 8px;">
+                    [<%= new Date().toLocaleTimeString() %>] Kernel checking filesystem...
+                </div>
+                <div style="margin-bottom: 8px; border-left: 2px solid var(--accent-purple); padding-left: 8px;">
+                    [<%= new Date().toLocaleTimeString() %>] Encryption bridges stable.
+                </div>
+                <div style="margin-bottom: 8px; border-left: 2px solid var(--status-green); padding-left: 8px;">
+                    [<%= new Date().toLocaleTimeString() %>] DNA extraction engine online.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

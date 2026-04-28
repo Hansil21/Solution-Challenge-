@@ -1,0 +1,47 @@
+{
+  "entities": {
+    "OfficialVideo": {
+      "title": "Official Video",
+      "description": "Metadata for authorized content assets.",
+      "type": "object",
+      "properties": {
+        "fileName": { "type": "string" },
+        "fileSize": { "type": "integer" },
+        "colorHash": { "type": "string" },
+        "audioHash": { "type": "string" },
+        "durationEstimate": { "type": "integer" },
+        "uploadedAt": { "type": "string", "format": "date-time" },
+        "status": { "type": "string" },
+        "userId": { "type": "string" }
+      },
+      "required": ["fileName", "fileSize", "userId"]
+    },
+    "ScanResult": {
+      "title": "Scan Result",
+      "description": "Detection result comparing suspect URLs to official assets.",
+      "type": "object",
+      "properties": {
+        "suspectUrl": { "type": "string" },
+        "comparedTo": { "type": "string" },
+        "similarityScore": { "type": "number" },
+        "status": { "type": "string" },
+        "severity": { "type": "string" },
+        "officialHash": { "type": "string" },
+        "suspectHash": { "type": "string" },
+        "scannedAt": { "type": "string", "format": "date-time" },
+        "userId": { "type": "string" }
+      },
+      "required": ["suspectUrl", "comparedTo", "userId"]
+    }
+  },
+  "firestore": {
+    "officialVideos/{videoId}": {
+      "schema": "OfficialVideo",
+      "description": "Collection of authorized reference videos."
+    },
+    "scanResults/{resultId}": {
+      "schema": "ScanResult",
+      "description": "Collection of leak detection reports."
+    }
+  }
+}

@@ -1,0 +1,179 @@
+<%- include('partials/header') %>
+
+<div class="hero stagger-in">
+    <h1 class="gradient-title" style="font-size: 3.5rem;">Security Analysis</h1>
+    <p class="subtitle">Deep DNA cross-reference complete. Reviewing signal similarity across global nodes.</p>
+</div>
+
+<div class="results-grid stagger-in">
+    <div class="glass-column">
+        <div class="glass-card" style="text-align: center; border-color: <%= result.similarityScore >= 80 ? 'var(--alert-red)' : (result.similarityScore >= 60 ? 'var(--alert-amber)' : 'rgba(16, 185, 129, 0.3)') %>">
+            <h3 class="sidebar-title" style="justify-content: center;">Analysis Confidence</h3>
+            
+            <div class="score-viz">
+                <svg width="220" height="220">
+                    <circle cx="110" cy="110" r="100"></circle>
+                    <circle class="progress" cx="110" cy="110" r="100" 
+                            style="stroke-dasharray: 628; stroke-dashoffset: <%= 628 - (628 * result.similarityScore / 100) %>; stroke: <%= result.similarityScore >= 80 ? 'var(--alert-red)' : (result.similarityScore >= 60 ? 'var(--alert-amber)' : 'var(--status-green)') %>"></circle>
+                </svg>
+                <div class="inner-score">
+                    <div class="num" style="color: <%= result.similarityScore >= 80 ? 'var(--alert-red)' : (result.similarityScore >= 60 ? 'var(--alert-amber)' : 'var(--status-green)') %>">
+                        <%= result.similarityScore %><span style="font-size: 1.5rem;">%</span>
+                    </div>
+                    <div class="label">Matched Signal</div>
+                </div>
+            </div>
+
+            <span class="badge <%= result.status === 'LEAK DETECTED' ? 'badge-leak' : 'badge-protected' %>" style="font-size: 0.9rem; padding: 10px 20px;">
+                <%= result.status %>
+            </span>
+        </div>
+    </div>
+
+    <div class="main-column">
+        <div class="glass-card">
+            <div class="card-header">
+                <h2 class="card-title"><span class="card-title-icon">⚲</span> Matched Asset Profile</h2>
+                <div style="font-size: 0.7rem; color: var(--text-secondary);">ID: <%= result._id %></div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                <div class="data-card">
+                    <div class="data-label">Official DNA Record</div>
+                    <div class="data-value"><%= result.comparedTo.fileName %></div>
+                </div>
+                <div class="data-card">
+                    <div class="data-label">External Suspect Path</div>
+                    <div class="data-value" style="font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= result.suspectUrl %></div>
+                </div>
+            </div>
+
+            <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 16px; padding: 25px;">
+                <h4 style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 20px; letter-spacing: 0.1em;">Technical Discrepancies</h4>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+                        <span style="color: var(--text-secondary);">Chrominance Variance</span>
+                        <span style="color: var(--status-green); font-weight: 700;">-0.02%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+                        <span style="color: var(--text-secondary);">Acoustic Alignment</span>
+                        <span style="color: var(--status-green); font-weight: 700;">99.4% Match</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+                        <span style="color: var(--text-secondary);">Timestamp Shift</span>
+                        <span style="color: var(--alert-amber); font-weight: 700;">+1.2s</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 40px; display: flex; gap: 15px;">
+                <% if (result.status === "LEAK DETECTED") { %>
+                    <button id="generate-notice-btn" class="btn btn-primary" style="background: var(--alert-red); flex: 2; box-shadow: 0 4px 20px rgba(244, 63, 94, 0.4);">
+                        ✦ EXECUTE LEGAL ENFORCEMENT
+                    </button>
+                <% } %>
+                <a href="/scan" class="btn" style="background: rgba(255,255,255,0.05); flex: 1;">NEW SCAN</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Legal Notice Modal -->
+<div id="notice-modal" class="modal-overlay">
+    <div class="glass-card modal-content">
+        <div class="modal-header">
+            <h3>AI Legal Enforcement notice</h3>
+            <button class="close-modal">&times;</button>
+        </div>
+        <div id="notice-text" class="shimmer-loading" style="min-height: 180px; white-space: pre-wrap; font-family: monospace; font-size: 0.85rem; padding: 20px; background: rgba(0,0,0,0.4); border-radius: 12px; margin-top: 20px; color: var(--text-secondary); line-height: 1.5; overflow-y: auto; max-height: 300px;">
+            Drafting formal legal documentation via Gemini AI...
+        </div>
+        <div style="margin-top: 25px; display: flex; gap: 12px; flex-wrap: wrap;">
+            <button class="btn btn-primary" style="flex: 1; min-width: 180px;" onclick="copyNotice()">COPY TO CLIPBOARD</button>
+            <button class="btn" style="flex: 1; min-width: 180px; background: #2563EB; color: white; border: none;" onclick="shareNotice()">SEND FORMAL NOTICE</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { GoogleGenAI } from "https://esm.run/@google/genai";
+
+    const GEMINI_API_KEY = "<%= geminiApiKey %>";
+    const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+
+    /* Legal Notice Modal */
+    const noticeModal = document.getElementById('notice-modal');
+    const generateBtn = document.getElementById('generate-notice-btn');
+    const closeModalBtns = document.querySelectorAll('.close-modal');
+    const noticeText = document.getElementById('notice-text');
+
+    if (generateBtn) {
+        generateBtn.addEventListener('click', async () => {
+            noticeModal.classList.add('active');
+            noticeText.innerHTML = "Initializing legal intelligence unit...";
+            noticeText.classList.add('shimmer-loading');
+
+            try {
+                // Fetch context for Gemini from our own API (which is just data, not AI call)
+                const scanData = await fetch(`/api/scan-data/<%= result.id %>`).then(r => r.json());
+                
+                const prompt = `Draft a formal Cease and Desist letter for a copyright violation.
+                Official Content: ${scanData.fileName}
+                Suspect infringing URL: ${scanData.suspectUrl}
+                DNA Similarity: ${scanData.similarityScore}%
+                Detection Status: ${scanData.status}
+                
+                The letter should be professional, stern, and include placeholders for legal names and dates.
+                Keep it concise but legally sound.`;
+
+                const response = await ai.models.generateContent({
+                    model: "gemini-3-flash-preview",
+                    contents: [{ parts: [{ text: prompt }] }],
+                });
+
+                if (response.text) {
+                    noticeText.innerText = response.text;
+                    noticeText.classList.remove('shimmer-loading');
+                } else {
+                    throw new Error("Generation mismatch");
+                }
+            } catch (err) {
+                console.error(err);
+                noticeText.innerText = "Error: Failed to synchronize with legal AI node. Please verify link integrity.";
+                noticeText.classList.remove('shimmer-loading');
+            }
+        });
+    }
+
+    closeModalBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            noticeModal.classList.remove('active');
+        });
+    });
+
+    window.copyNotice = function() {
+        const text = document.getElementById('notice-text').innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            const copyBtn = event.target;
+            const originalText = copyBtn.innerText;
+            copyBtn.innerText = "✓ COPIED";
+            setTimeout(() => copyBtn.innerText = originalText, 2000);
+        });
+    };
+
+    window.shareNotice = function() {
+        const text = document.getElementById('notice-text').innerText;
+        const subject = encodeURIComponent('URGENT: Cease and Desist - Intellectual Property Violation Detected');
+        const body = encodeURIComponent(text);
+        
+        const mailtoUrl = `mailto:?subject=${subject}&body=${body}`;
+        
+        if (mailtoUrl.length > 2000) {
+            alert('Warning: Notice content is extensive. If your mail client does not open, please use "Copy to Clipboard" instead.');
+        }
+        
+        window.location.href = mailtoUrl;
+    };
+</script>
+
+<%- include('partials/footer') %>

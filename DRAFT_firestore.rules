@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) { 
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); 
+    }
+
+    function isValidOfficialVideo(data) {
+      return data.fileName is string && data.fileName.size() <= 256 &&
+             data.fileSize is int && data.fileSize > 0 &&
+             data.userId is string &&
+             data.keys().hasAll(['fileName', 'fileSize', 'colorHash', 'audioHash', 'durationEstimate', 'uploadedAt', 'status', 'userId']) &&
+             data.keys().size() == 8;
+    }
+
+    function isValidScanResult(data) {
+      return data.suspectUrl is string && data.suspectUrl.size() <= 2048 &&
+             data.comparedTo is string && isValidId(data.comparedTo) &&
+             data.userId is string &&
+             data.keys().hasAll(['suspectUrl', 'comparedTo', 'similarityScore', 'status', 'severity', 'officialHash', 'suspectHash', 'scannedAt', 'userId']) &&
+             data.keys().size() == 9;
+    }
+
+    match /officialVideos/{videoId} {
+      // Public mode: anyone can create/read, but must be valid schema
+      allow create: if isValidId(videoId) && isValidOfficialVideo(request.resource.data);
+      allow get, list: if true;
+      allow delete: if true; // In full public mode, we let anyone delete
+    }
+
+    match /scanResults/{resultId} {
+      allow create: if isValidId(resultId) && isValidScanResult(request.resource.data);
+      allow get, list: if true;
+      allow delete: if true;
+    }
+  }
+}
